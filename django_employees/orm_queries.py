@@ -70,8 +70,9 @@ def get_person_jobs(person_id: int) -> list[dict[str, str]]:
     :param person_id:
     :return:
     """
-    jobs = Employee.objects.prefetch_related('company').filter(person=person_id)
+    jobs = Employee.objects.prefetch_related("company").filter(person=person_id)
     return [{job.company.company_name: job.job_title} for job in jobs]
+
 
 if __name__ == "__main__":
     print(get_person_jobs(11))

@@ -21,8 +21,10 @@ def populate(path: str, table: str):
             if table.lower() == "employees":
                 p = Person.objects.get(id=int(row.pop("person_id")))
                 c = Company.objects.get(id=int(row.pop("company_id")))
-                iscurrentjob = row.pop('is_current_job').capitalize()
-                Employee.objects.create(person=p, company=c, is_current_job=iscurrentjob, **row)
+                iscurrentjob = row.pop("is_current_job").capitalize()
+                Employee.objects.create(
+                    person=p, company=c, is_current_job=iscurrentjob, **row
+                )
             elif table.lower() == "companies":
                 Company.objects.create(**row)
             elif table.lower() == "persons":

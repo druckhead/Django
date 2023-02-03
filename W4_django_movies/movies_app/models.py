@@ -5,7 +5,6 @@ from django.db import models
 
 
 class Actor(models.Model):
-
     name = models.CharField(max_length=256, db_column="name", null=False, blank=False)
     birth_year = models.IntegerField(db_column="birth_year", null=False)
 
@@ -17,7 +16,6 @@ class Actor(models.Model):
 
 
 class Movie(models.Model):
-
     name = models.CharField(max_length=256, db_column="name", null=False)
     description = models.TextField(db_column="description", null=False)
     duration_in_min = models.FloatField(db_column="duration", null=False)
@@ -38,7 +36,6 @@ class Movie(models.Model):
 
 
 class Rating(models.Model):
-
     movie = models.ForeignKey(
         "Movie",
         on_delete=models.CASCADE,

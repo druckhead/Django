@@ -1,9 +1,9 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 
+
 # Create your models here.
 class Actor(models.Model):
-
     name = models.CharField(max_length=256, db_column="name", null=False, blank=False)
     birth_year = models.IntegerField(db_column="birth_year", null=False)
 
@@ -24,7 +24,7 @@ class Movie(models.Model):
         validators=[MinValueValidator(1900), MaxValueValidator(2050)],
     )
     pic_url = models.URLField(db_column="poster_url", max_length=512, null=True)
-    actors = models.ManyToManyField(Actor, through='MovieActor')
+    actors = models.ManyToManyField(Actor, through="MovieActor")
 
     def __str__(self) -> str:
         return self.name

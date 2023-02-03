@@ -72,5 +72,5 @@ from movies_app.models import Movie, Rating, Review
 #     m = m.filter(duration_in_mins=filter_by_min)
 # if name_to_filter:
 #     m = m.filter(name__iexact=name_to_filter)
-    
+
 # print(m.query)
