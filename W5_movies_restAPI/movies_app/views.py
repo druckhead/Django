@@ -1,3 +1,5 @@
+from gzip import READ
+from turtle import st
 from django.shortcuts import get_object_or_404, render
 from django.urls import is_valid_path
 from movies_app.models import *
@@ -117,18 +119,22 @@ def ratings_list(request: Request):
 def movie_actors(request: Request, movie_id: int):
     if request.method == "GET":
         movie_actors = MovieActor.objects.filter(movie_id=movie_id)
-        if 'main_roles' in request.query_params:
-            is_true = request.query_params['main_roles'] == '1'
+        if "main_roles" in request.query_params:
+            is_true = request.query_params["main_roles"] == "1"
             if is_true:
                 movie_actors = movie_actors.filter(main_role=True)
-        if 'salary_from' in request.query_params:
-            movie_actors = movie_actors.filter(salary__gte=request.query_params['salary_from'])
-        if 'salary_to' in request.query_params:
-            movie_actors = movie_actors.filter(salary__lte=request.query_params['salary_to'])
+        if "salary_from" in request.query_params:
+            movie_actors = movie_actors.filter(
+                salary__gte=request.query_params["salary_from"]
+            )
+        if "salary_to" in request.query_params:
+            movie_actors = movie_actors.filter(
+                salary__lte=request.query_params["salary_to"]
+            )
         serializer = MovieActorSerializer(movie_actors, many=True)
         return Response(serializer.data)
     elif request.method == "POST":
-        movie = get_object_or_404(Movie, id=movie_id)
+        get_object_or_404(Movie, id=movie_id)
         serializer = AddMovieActorSerializer(
             data=request.data,  # type: ignore
             context={"movie_id": movie_id, "request": request},
@@ -136,6 +142,83 @@ def movie_actors(request: Request, movie_id: int):
         if serializer.is_valid(raise_exception=True):
             serializer.create(serializer.validated_data)
             return Response(status=status.HTTP_200_OK)
+
+
+@api_view(["POST"])
+def create_actor(request: Request):
+    serializer = ActorSerializer(data=request.data)  # type: ignore
+    if serializer.is_valid(raise_exception=True):
+        serializer.create(validated_data=serializer.validated_data)
+        return Response(status=status.HTTP_201_CREATED)
+
+
+@api_view(["GET", "PATCH", "DELETE"])
+def actor_details(request: Request, actor_id: int):
+    actor = get_object_or_404(Actor, id=actor_id)
+    if request.method == "GET":
+        serializer = ActorSerializer(instance=actor, many=False)
+        return Response(serializer.data)
+    elif request.method == "PATCH":
+        serializer = ActorSerializer(
+            actor,
+            data=request.data,  # type: ignore
+            many=False,
+            partial=True,
+        )
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(status=status.HTTP_200_OK)
+    elif request.method == "DELETE":
+        actor.delete()
+        return Response(status=status.HTTP_200_OK)
+
+
+@api_view(["DELETE", "PATCH"])
+def alter_movie_actor(request: Request, movie_id: int, actor_id: int):
+    movieactor = get_object_or_404(MovieActor, movie_id=movie_id, actor_id=actor_id)
+    if request.method == "DELETE":
+        movieactor.delete()
+        return Response(status=status.HTTP_200_OK)
+
+    elif request.method == "PATCH":
+        serializer = MovieActorPatchSerializer(
+            movieactor,
+            data=request.data,  # type: ignore
+            many=False,
+            partial=True,
+        )
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(status=status.HTTP_200_OK)
+
+
+@api_view(["POST", "GET"])
+def movie_rating(request: Request, movie_id: int):
+    if request.method == "POST":
+        serializer = AddRatingSerializer(
+            data=request.data,  # type: ignore
+            context={
+                "movie_id": movie_id,
+                "request": request,
+            },
+        )
+        if serializer.is_valid(raise_exception=True):
+            serializer.create(validated_data=serializer.validated_data)
+            return Response(status=status.HTTP_201_CREATED)
+
+    if request.method == "GET":
+        ratings = Rating.objects.filter(movie_id=movie_id)
+        if not ratings:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        serializer = SpecificMovieRatingsSerializer(instance=ratings, many=True)
+        return Response(serializer.data)
+
+
+@api_view(["DELETE"])
+def delete_movie_rating(request: Request, movie_id: int, rating_id: int):
+    rating = get_object_or_404(Rating, movie_id=movie_id, id=rating_id)
+    rating.delete()
+    return Response(status=status.HTTP_200_OK)
 
 
 def index(request):

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from rest_framework.fields import CharField, IntegerField
+from rest_framework.fields import CharField, DateField, IntegerField
 from .models import *
 
 
@@ -85,3 +85,23 @@ class AddMovieActorSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         MovieActor.objects.create(movie_id=self.context["movie_id"], **validated_data)
+
+
+class MovieActorPatchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MovieActor
+        fields = "__all__"
+
+
+class AddRatingSerializer(serializers.Serializer):
+    rating = IntegerField(min_value=0, max_value=10)
+    rating_date = DateField()
+
+    def create(self, validated_data):
+        Rating.objects.create(movie_id=self.context["movie_id"], **validated_data)
+
+
+class SpecificMovieRatingsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Rating
+        exclude = ["movie"]
