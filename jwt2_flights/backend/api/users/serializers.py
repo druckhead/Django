@@ -15,6 +15,7 @@ class UserResgisterSerializer(serializers.ModelSerializer):
             "username",
             "password",
             "confirm_password",
+            "is_staff",
         ]
         extra_kwargs = {
             "first_name": {
@@ -29,8 +30,17 @@ class UserResgisterSerializer(serializers.ModelSerializer):
                     UniqueValidator(queryset=User.objects.all()),
                 ],
             },
-            "password": {"write_only": True, "required": True},
-            "password_confirm": {"write_only": True, "required": True},
+            "password": {
+                "write_only": True,
+                "required": True,
+            },
+            "password_confirm": {
+                "write_only": True,
+                "required": True,
+            },
+            "is_staff": {
+                "default": False,
+            },
         }
 
     def validate(self, attrs):
