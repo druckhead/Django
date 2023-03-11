@@ -1,6 +1,9 @@
-from rest_framework import viewsets
+from rest_framework import status, viewsets
+from rest_framework.viewsets import GenericViewSet
+from rest_framework.mixins import CreateModelMixin, DestroyModelMixin, ListModelMixin, RetrieveModelMixin, UpdateModelMixin
 from rest_framework.pagination import LimitOffsetPagination, PageNumberPagination
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, BasePermission, SAFE_METHODS
+from rest_framework.response import Response
 
 from imdb_app.models import Movie
 from imdb_app.serializers.movies import MovieSerializer
@@ -16,7 +19,11 @@ class MoviesPermissions(BasePermission):
             return request.user.is_staff
 
 
-class MoviesViewSet(viewsets.ModelViewSet):
+class MoviesViewSet(CreateModelMixin,
+                    RetrieveModelMixin,
+                    UpdateModelMixin,
+                    ListModelMixin,
+                    GenericViewSet):
 
     queryset = Movie.objects.all()
 
@@ -29,4 +36,3 @@ class MoviesViewSet(viewsets.ModelViewSet):
     # pagination is defined either using DEFAULT_PAGINATION_CLASS in settings.py
     # or you can specify one here
     # pagination_class = MoviesPaginationClass
-

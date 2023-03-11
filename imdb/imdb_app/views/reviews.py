@@ -1,4 +1,5 @@
-from rest_framework import mixins
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import mixins, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, BasePermission
 from rest_framework.response import Response
@@ -31,6 +32,9 @@ class ReviewsViewSet(ModelViewSet):
     # we need different serializers for different actions
     serializer_class = ReviewSerializer
 
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['movie',]
+
     def get_queryset(self):
         qs = self.queryset
         if self.action == 'list':
@@ -38,3 +42,16 @@ class ReviewsViewSet(ModelViewSet):
                 qs = qs.filter(user=self.request.user)
         return qs
 
+    def create(self, request, *args, **kwargs):
+        request_data = request.data
+        if "user" not in request_data:
+            request_data["user"] = request.user.id
+
+        if Review.objects.filter(user_id=request_data["user"], movie_id=request_data["movie"]):
+            return Response(data={"reviews": "user already posted review"}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = self.get_serializer(data=request_data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)

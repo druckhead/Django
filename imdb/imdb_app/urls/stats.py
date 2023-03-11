@@ -15,20 +15,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-)
+from ..views.stats import stats
 
-from imdb_app.views.auth import signup, me
-
-urlpatterns = [
-    path('signup', signup),
-    path('signup/', signup),
-    path('token', TokenObtainPairView.as_view()),
-    path('token/', TokenObtainPairView.as_view()),
-    path('token/refresh', TokenRefreshView.as_view()),
-    path('token/refresh/', TokenRefreshView.as_view()),
-    path('me/', me)
-]
+urlpatterns = [path("", stats)]

@@ -18,7 +18,12 @@ from django.urls import path, include
 
 
 urlpatterns = [
+    path("admin/", admin.site.urls),
     path('api/auth/', include('imdb_app.urls.auth')),
+    path('api/movies', include('imdb_app.urls.movies')),
     path('api/movies/', include('imdb_app.urls.movies')),
-    path('api/reviews/', include('imdb_app.urls.reviews'))
+    path('api/reviews', include('imdb_app.urls.reviews')),
+    path('api/reviews/', include('imdb_app.urls.reviews')),
+    path("api/stats", include('imdb_app.urls.stats')),
+    path("api/stats/", include('imdb_app.urls.stats'))
 ]
