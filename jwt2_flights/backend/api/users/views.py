@@ -8,7 +8,11 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from .permissions import UserPermission
 
-from .serializers import UserResgisterSerializer, UserSerializer, StaffRegisterSerializer
+from .serializers import (
+    UserResgisterSerializer,
+    UserSerializer,
+    StaffRegisterSerializer,
+)
 
 
 class UserViewSet(
@@ -29,7 +33,7 @@ class UserRegistrationViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
 
 
 class StaffRegistrationViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
-    serializer_class = UserResgisterSerializer
+    serializer_class = StaffRegisterSerializer
     permission_classes = [IsAdminUser]
 
 

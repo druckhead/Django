@@ -17,7 +17,7 @@ class Order(TimeStampedModel, models.Model):
         on_delete=models.DO_NOTHING,
     )
     number_of_seats = models.SmallIntegerField()
-    total_price = models.DecimalField(max_digits=8, decimal_places=2)
+    total_price = models.FloatField(null=True, blank=True)
 
     def clean(self) -> ValidationError | None:
         if self.number_of_seats > self.flight.seats_left:
@@ -26,6 +26,15 @@ class Order(TimeStampedModel, models.Model):
                     "seats": "Number of ordered seats can not exceed number of seats left on flight"
                 }
             )
+
+    def save(self, **kwargs):
+        self.full_clean()
+        self.total_price = self.number_of_seats * self.flight.price
+
+        super().save(**kwargs)
+
+        self.flight.seats_left -= self.number_of_seats
+        self.flight.save(update_fields=["seats_left"])
 
     def __str__(self) -> str:
         return f"{self.flight_id}"
